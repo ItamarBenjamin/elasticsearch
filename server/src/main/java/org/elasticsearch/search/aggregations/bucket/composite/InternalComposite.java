@@ -393,11 +393,11 @@ public class InternalComposite
         return obj;
     }
 
-    private static class ArrayMap extends AbstractMap<String, Object> implements Comparable<Map<String,Object>> {
+    static class ArrayMap extends AbstractMap<String, Object> implements Comparable<Map<String,Object>> {
         final List<String> keys;
         final Object[] values;
 
-        ArrayMap(List<String> keys, List<DocValueFormat> formats, Comparable[] values) {
+        ArrayMap(List<String> keys, List<DocValueFormat> formats, Object[] values) {
             assert keys.size() == values.length && keys.size() == formats.size();
             this.keys = keys;
             this.values = new Object[values.length];
@@ -471,13 +471,14 @@ public class InternalComposite
          */
         private static int objectCompare(Object a, Object b) {
             if (a.getClass() != b.getClass()) {
-                throw new IllegalStateException("expecting values to be of the same type " + a  + ", " + b);
+                throw new IllegalStateException("expecting values to be of the same type but got: " + a
+                    + "(" + a.getClass() +"), " + b + "(" + b.getClass() +")");
             }
             if (Comparable.class.isAssignableFrom(a.getClass())) {
                 Comparable<Object> ca = (Comparable<Object>) a;
                 return ca.compareTo(b);
             }
-            throw new IllegalStateException("expecting values to be comparable" + a  + ", " + b);
+            throw new IllegalStateException("expecting values types to implement java.lang.Comparable but got: " + a.getClass());
         }
 
         @Override
